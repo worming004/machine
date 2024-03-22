@@ -9,13 +9,6 @@ type Machine struct {
 	countOfIgnoredTransition int
 }
 
-type StateName string
-
-var (
-	IddleStateName             StateName = "IddleState"
-	WithPieceInBufferStateName StateName = "WithPieceInBufferState"
-)
-
 func (m *Machine) GetStateName() StateName {
 	return m.currentState.GetStateName()
 }
@@ -57,28 +50,8 @@ func WithBubbles(bubbles []*Bubble) options {
 	}
 }
 
-type State interface {
-	PutMoney(piece Piece)
-	Turn() *Bubble
-	GetStateName() StateName
-}
-
 type Piece int
-
-type Bubble string
-
-func (b *Bubble) String() string {
-	return string(*b)
-}
 
 func (m *Machine) PrintState() {
 	fmt.Printf("Current state: {pieces: %d, state: %T, bubble: %v, countOfIgnoredTransition: %d}\n", m.pieces, m.currentState, printableBubbles(m.bubbles), m.countOfIgnoredTransition)
-}
-
-func printableBubbles(b []*Bubble) string {
-	var s string
-	for _, v := range b {
-		s += string(*v) + ", "
-	}
-	return "[" + s[:len(s)-2] + "]"
 }

@@ -29,7 +29,7 @@ func TestSimpleUsage(t *testing.T) {
 		t.Errorf("Expected bubble to be %s, but got %s", uniqueBubbleName, b.String())
 	}
 	if m.GetStateName() != bubblemachine.IddleStateName {
-		t.Errorf("Expected state to be %s, but got %s", bubblemachine.IddleStateName, m.GetStateName())
+	 	t.Errorf("Expected state to be %s, but got %s", bubblemachine.IddleStateName, m.GetStateName())
 	}
 
 	if m.CountOfIgnoredTransition() != 0 {
