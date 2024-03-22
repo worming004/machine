@@ -1,40 +1,21 @@
 package bubblemachine
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+	"os"
+)
 
-type Machine struct {
+type machine struct {
 	pieces                   []Piece
 	currentState             State
 	bubbles                  []*Bubble
 	countOfIgnoredTransition int
+	inspectWriter            io.Writer
 }
 
-func (m *Machine) GetStateName() StateName {
-	return m.currentState.GetStateName()
-}
-
-// PutMoney implements State.
-func (m *Machine) PutMoney(piece Piece) {
-	m.currentState.PutMoney(piece)
-}
-
-// Turn implements State.
-func (m *Machine) Turn() *Bubble {
-	return m.currentState.Turn()
-}
-
-func (m *Machine) incrementNumberOfIgnoredTransition() {
-	m.countOfIgnoredTransition++
-}
-
-func (m *Machine) CountOfIgnoredTransition() int {
-	return m.countOfIgnoredTransition
-}
-
-var m State = &Machine{}
-
-func NewMachine(options ...options) *Machine {
-	m := &Machine{}
+func NewMachine(options ...options) *machine {
+	m := &machine{inspectWriter: os.Stdout}
 	m.currentState = newIddleState(m)
 	for _, option := range options {
 		option(m)
@@ -42,16 +23,44 @@ func NewMachine(options ...options) *Machine {
 	return m
 }
 
-type options func(m *Machine)
+func (m *machine) GetStateName() StateName {
+	return m.currentState.GetStateName()
+}
+
+func (m *machine) PutMoney(piece Piece) {
+	m.currentState.PutMoney(piece)
+}
+
+func (m *machine) Turn() *Bubble {
+	return m.currentState.Turn()
+}
+
+func (m *machine) incrementNumberOfIgnoredTransition() {
+	m.countOfIgnoredTransition++
+}
+
+func (m *machine) CountOfIgnoredTransition() int {
+	return m.countOfIgnoredTransition
+}
+
+var m State = &machine{}
+
+type options func(m *machine)
 
 func WithBubbles(bubbles []*Bubble) options {
-	return func(m *Machine) {
+	return func(m *machine) {
 		m.bubbles = bubbles
+	}
+}
+
+func WithLogWriter(writer io.Writer) options {
+	return func(m *machine) {
+		m.inspectWriter = writer
 	}
 }
 
 type Piece int
 
-func (m *Machine) PrintState() {
-	fmt.Printf("Current state: {pieces: %d, state: %T, bubble: %v, countOfIgnoredTransition: %d}\n", m.pieces, m.currentState, printableBubbles(m.bubbles), m.countOfIgnoredTransition)
+func (m *machine) PrintState() {
+	fmt.Fprintf(m.inspectWriter, "Current state: {pieces: %d, state: %T, bubble: %v, countOfIgnoredTransition: %d}\n", m.pieces, m.currentState, printableBubbles(m.bubbles), m.countOfIgnoredTransition)
 }

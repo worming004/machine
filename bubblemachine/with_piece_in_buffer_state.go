@@ -1,18 +1,18 @@
 package bubblemachine
 
+// Ensure at compile time it implements State
 var withPieceInBufferStateImpl State = withPieceInBufferState{}
 
 type withPieceInBufferState struct {
-	machine *Machine
+	machine *machine
 }
 
-// GetStateName implements State.
+func newWithPieceInBuffer(machine *machine) withPieceInBufferState {
+	return withPieceInBufferState{machine}
+}
+
 func (w withPieceInBufferState) GetStateName() StateName {
 	return WithPieceInBufferStateName
-}
-
-func newWithPieceInBuffer(machine *Machine) withPieceInBufferState {
-	return withPieceInBufferState{machine}
 }
 
 func (w withPieceInBufferState) PutMoney(piece Piece) {

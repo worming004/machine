@@ -1,18 +1,19 @@
 package bubblemachine
 
+// Ensure at compile time it implements State
 var iddleStateImpl State = iddleState{}
 
 type iddleState struct {
-	machine *Machine
+	machine *machine
+}
+
+func newIddleState(machine *machine) iddleState {
+	return iddleState{machine}
 }
 
 // GetStateName implements State.
 func (i iddleState) GetStateName() StateName {
 	return IddleStateName
-}
-
-func newIddleState(machine *Machine) iddleState {
-	return iddleState{machine}
 }
 
 func (i iddleState) PutMoney(piece Piece) {
