@@ -1,6 +1,6 @@
 package bubblemachine
 
-var withPieceInBufferState State = WithPieceInBufferState{}
+var withPieceInBufferStateImpl State = WithPieceInBufferState{}
 
 type WithPieceInBufferState struct {
 	machine *Machine

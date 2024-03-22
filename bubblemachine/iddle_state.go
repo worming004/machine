@@ -1,26 +1,26 @@
 package bubblemachine
 
-var iddleState State = IddleState{}
+var iddleStateImpl State = iddleState{}
 
-type IddleState struct {
+type iddleState struct {
 	machine *Machine
 }
 
 // GetStateName implements State.
-func (i IddleState) GetStateName() StateName {
+func (i iddleState) GetStateName() StateName {
 	return IddleStateName
 }
 
-func newIddleState(machine *Machine) IddleState {
-	return IddleState{machine}
+func newIddleState(machine *Machine) iddleState {
+	return iddleState{machine}
 }
 
-func (i IddleState) PutMoney(piece Piece) {
+func (i iddleState) PutMoney(piece Piece) {
 	i.machine.pieces = append(i.machine.pieces, piece)
 	i.machine.currentState = newWithPieceInBuffer(i.machine)
 }
 
-func (i IddleState) Turn() *Bubble {
+func (i iddleState) Turn() *Bubble {
 	i.machine.incrementNumberOfIgnoredTransition()
 	return nil
 }
