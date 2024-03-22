@@ -1,10 +1,17 @@
 package bubblemachine
 
+var withPieceInBufferState State = WithPieceInBufferState{}
+
 type WithPieceInBufferState struct {
 	machine *Machine
 }
 
-func NewWithPieceInBuffer(machine *Machine) WithPieceInBufferState {
+// GetStateName implements State.
+func (w WithPieceInBufferState) GetStateName() StateName {
+	return WithPieceInBufferStateName
+}
+
+func newWithPieceInBuffer(machine *Machine) WithPieceInBufferState {
 	return WithPieceInBufferState{machine}
 }
 
@@ -13,7 +20,7 @@ func (w WithPieceInBufferState) PutMoney(piece Piece) {
 }
 
 func (w WithPieceInBufferState) Turn() *Bubble {
-	w.machine.currentState = NewIddleState(w.machine)
+	w.machine.currentState = newIddleState(w.machine)
 	b, bs := pop(w.machine.bubbles)
 	w.machine.bubbles = bs
 	return b
