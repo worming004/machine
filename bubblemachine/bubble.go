@@ -6,6 +6,10 @@ func (b Bubble) String() string {
 	return string(b)
 }
 
+func NewBubble(name string) Bubble {
+	return Bubble(name)
+}
+
 func printableBubbles(b []Bubble) string {
 	var s string
 	for _, v := range b {

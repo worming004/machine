@@ -1,12 +1,14 @@
 package bubblemachine
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
 )
 
 type Machine struct {
+	id                       int64
 	pieces                   []Piece
 	currentState             State
 	bubbles                  []Bubble
@@ -14,7 +16,15 @@ type Machine struct {
 	inspectWriter            io.Writer
 }
 
-func NewMachine(options ...options) *Machine {
+func (m *Machine) GetId() int64 {
+	return m.id
+}
+
+func (m *Machine) SetId(id int64) {
+	m.id = id
+}
+
+func InitMachine(options ...options) *Machine {
 	m := &Machine{inspectWriter: os.Stdout}
 	m.currentState = newIddleState(m)
 	for _, option := range options {
@@ -25,6 +35,11 @@ func NewMachine(options ...options) *Machine {
 
 func (m *Machine) GetStateName() StateName {
 	return m.currentState.GetStateName()
+}
+
+func (m *Machine) GetBubbles() []Bubble {
+	// TODO should return a copy of the bubbles
+	return m.bubbles
 }
 
 func (m *Machine) PutMoney(piece Piece) {
@@ -59,13 +74,11 @@ func WithLogWriter(writer io.Writer) options {
 	}
 }
 
-type Piece int
-
 func (m *Machine) PrintState() {
 	fmt.Fprintf(m.inspectWriter, "Current state: {pieces: %d, state: %T, bubble: %v, countOfIgnoredTransition: %d}\n", m.pieces, m.currentState, printableBubbles(m.bubbles), m.countOfIgnoredTransition)
 }
 
 type MachineRepository interface {
-	Save(m *Machine) error
-	Get(id int) (*Machine, error)
+	Save(ctx context.Context, m *Machine) error
+	Get(ctx context.Context, id int) (*Machine, error)
 }

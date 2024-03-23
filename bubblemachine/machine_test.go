@@ -11,7 +11,7 @@ func TestSimpleUsage(t *testing.T) {
 
 	uniqueBubbleName := "pokemon"
 
-	m := bubblemachine.NewMachine(bubblemachine.WithBubbles(buildBubbles(uniqueBubbleName)))
+	m := bubblemachine.InitMachine(bubblemachine.WithBubbles(buildBubbles(uniqueBubbleName)))
 
 	if m.GetStateName() != bubblemachine.IddleStateName {
 		t.Errorf("Expected state to be %s, but got %s", bubblemachine.IddleStateName, m.GetStateName())

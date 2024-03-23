@@ -1,25 +1,28 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"log"
 
 	"github.com/worming004/machine/bubblemachine"
+	"github.com/worming004/machine/sqliterepository"
 )
 
 func main() {
-	machine := bubblemachine.NewMachine(bubblemachine.WithBubbles(defaultBubbles()))
-	machine.PrintState()
-	machine.Turn() // Should increment the number of ignored transitions
-	machine.PrintState()
-	machine.PutMoney(bubblemachine.Piece(1))
-	machine.PrintState()
+	machine := bubblemachine.InitMachine(bubblemachine.WithBubbles(defaultBubbles()))
+	repo, err := sqliterepository.NewMachineRepository(sqliterepository.NewRepositoryRequest{DataSourceName: "test.db", Init: true})
+	if err != nil {
+		panic(err)
+	}
+	defer repo.Close()
+	err = repo.Save(context.Background(), machine)
 
-	machine.PutMoney(bubblemachine.Piece(2)) // Should increment the number of ignored transitions
-	machine.PrintState()
-	bubble := machine.Turn()
-	machine.PrintState()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	fmt.Printf("Bubble: %s\n", bubble)
+	log.Print("Machine saved successfully with Id ", machine.GetId())
+
 }
 
 func defaultBubbles() []bubblemachine.Bubble {
