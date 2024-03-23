@@ -6,16 +6,16 @@ import (
 	"os"
 )
 
-type machine struct {
+type Machine struct {
 	pieces                   []Piece
 	currentState             State
-	bubbles                  []*Bubble
+	bubbles                  []Bubble
 	countOfIgnoredTransition int
 	inspectWriter            io.Writer
 }
 
-func NewMachine(options ...options) *machine {
-	m := &machine{inspectWriter: os.Stdout}
+func NewMachine(options ...options) *Machine {
+	m := &Machine{inspectWriter: os.Stdout}
 	m.currentState = newIddleState(m)
 	for _, option := range options {
 		option(m)
@@ -23,44 +23,49 @@ func NewMachine(options ...options) *machine {
 	return m
 }
 
-func (m *machine) GetStateName() StateName {
+func (m *Machine) GetStateName() StateName {
 	return m.currentState.GetStateName()
 }
 
-func (m *machine) PutMoney(piece Piece) {
+func (m *Machine) PutMoney(piece Piece) {
 	m.currentState.PutMoney(piece)
 }
 
-func (m *machine) Turn() *Bubble {
+func (m *Machine) Turn() Bubble {
 	return m.currentState.Turn()
 }
 
-func (m *machine) incrementNumberOfIgnoredTransition() {
+func (m *Machine) incrementNumberOfIgnoredTransition() {
 	m.countOfIgnoredTransition++
 }
 
-func (m *machine) CountOfIgnoredTransition() int {
+func (m *Machine) CountOfIgnoredTransition() int {
 	return m.countOfIgnoredTransition
 }
 
-var m State = &machine{}
+var m State = &Machine{}
 
-type options func(m *machine)
+type options func(m *Machine)
 
-func WithBubbles(bubbles []*Bubble) options {
-	return func(m *machine) {
+func WithBubbles(bubbles []Bubble) options {
+	return func(m *Machine) {
 		m.bubbles = bubbles
 	}
 }
 
 func WithLogWriter(writer io.Writer) options {
-	return func(m *machine) {
+	return func(m *Machine) {
 		m.inspectWriter = writer
 	}
 }
 
 type Piece int
 
-func (m *machine) PrintState() {
+func (m *Machine) PrintState() {
 	fmt.Fprintf(m.inspectWriter, "Current state: {pieces: %d, state: %T, bubble: %v, countOfIgnoredTransition: %d}\n", m.pieces, m.currentState, printableBubbles(m.bubbles), m.countOfIgnoredTransition)
+}
+
+type MachineRepository interface {
+	Save(m *Machine) error
+	Get(id int) (*Machine, error)
 }

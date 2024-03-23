@@ -19,15 +19,15 @@ func main() {
 	bubble := machine.Turn()
 	machine.PrintState()
 
-	fmt.Printf("Bubble: %s\n", *bubble)
+	fmt.Printf("Bubble: %s\n", bubble)
 }
 
-func defaultBubbles() []*bubblemachine.Bubble {
-	bubble := make([]*bubblemachine.Bubble, 3)
+func defaultBubbles() []bubblemachine.Bubble {
+	bubble := make([]bubblemachine.Bubble, 3)
 
 	for i, v := range []string{"Troll", "ToyCar", "Pokemon"} {
 		b := bubblemachine.Bubble(v)
-		bubble[i] = &b
+		bubble[i] = b
 	}
 	return bubble
 }

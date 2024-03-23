@@ -2,7 +2,7 @@ package bubblemachine
 
 type State interface {
 	PutMoney(piece Piece)
-	Turn() *Bubble
+	Turn() Bubble
 	GetStateName() StateName
 }
 
@@ -12,4 +12,3 @@ var (
 	IddleStateName             StateName = "IddleState"
 	WithPieceInBufferStateName StateName = "WithPieceInBufferState"
 )
-

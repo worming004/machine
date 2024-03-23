@@ -4,10 +4,10 @@ package bubblemachine
 var iddleStateImpl State = iddleState{}
 
 type iddleState struct {
-	machine *machine
+	machine *Machine
 }
 
-func newIddleState(machine *machine) iddleState {
+func newIddleState(machine *Machine) iddleState {
 	return iddleState{machine}
 }
 
@@ -21,7 +21,7 @@ func (i iddleState) PutMoney(piece Piece) {
 	i.machine.currentState = newWithPieceInBuffer(i.machine)
 }
 
-func (i iddleState) Turn() *Bubble {
+func (i iddleState) Turn() Bubble {
 	i.machine.incrementNumberOfIgnoredTransition()
-	return nil
+	return Bubble("")
 }
