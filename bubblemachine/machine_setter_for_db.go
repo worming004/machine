@@ -6,34 +6,33 @@ import (
 )
 
 // This is a helper for database. Do not use it elsewhere
-type MachineSetterForDb struct {
+type machineSetterForDb struct {
 	mach *Machine
 }
 
-func NewMachineSetterForDb(m *Machine) *MachineSetterForDb {
+func NewMachineSetterForDb(m *Machine) *machineSetterForDb {
 	if m.inspectWriter == nil {
-
 		m.inspectWriter = os.Stdout
 	}
-	return &MachineSetterForDb{m}
+	return &machineSetterForDb{m}
 }
 
-func (m *MachineSetterForDb) SetBubbles(bs []Bubble) *MachineSetterForDb {
+func (m *machineSetterForDb) SetBubbles(bs []Bubble) *machineSetterForDb {
 	m.mach.bubbles = bs
 	return m
 }
 
-func (m *MachineSetterForDb) SetPieces(ps []Piece) *MachineSetterForDb {
+func (m *machineSetterForDb) SetPieces(ps []Piece) *machineSetterForDb {
 	m.mach.pieces = ps
 	return m
 }
 
-func (m *MachineSetterForDb) SetCount(c int) *MachineSetterForDb {
+func (m *machineSetterForDb) SetCount(c int) *machineSetterForDb {
 	m.mach.countOfIgnoredTransition = c
 	return m
 }
 
-func (m *MachineSetterForDb) SetStateByName(sn StateName) (*MachineSetterForDb, error) {
+func (m *machineSetterForDb) SetStateByName(sn StateName) (*machineSetterForDb, error) {
 	switch sn {
 	case IddleStateName:
 		m.mach.currentState = newIddleState(m.mach)
