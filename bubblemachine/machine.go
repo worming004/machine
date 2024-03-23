@@ -38,8 +38,13 @@ func (m *Machine) GetStateName() StateName {
 }
 
 func (m *Machine) GetBubbles() []Bubble {
-	// TODO should return a copy of the bubbles
+	// TODO should return a copy
 	return m.bubbles
+}
+
+func (m *Machine) GetPieces() []Piece {
+	// TODO should return a copy
+	return m.pieces
 }
 
 func (m *Machine) PutMoney(piece Piece) {

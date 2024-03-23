@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/worming004/machine/bubblemachine"
@@ -71,7 +72,58 @@ func initDb(m *MachineRepository) error {
 
 // Get implements bubblemachine.MachineRepository.
 func (m MachineRepository) Get(ctx context.Context, id int) (*bubblemachine.Machine, error) {
-	panic("unimplemented")
+	machinerows, err := m.db.Query(`SELECT state, count_of_ignored_transition FROM machines WHERE id = ?`, id)
+	if err != nil {
+		return nil, err
+	}
+	defer machinerows.Close()
+
+	var (
+		stateName                string
+		countOfIgnoredTransition int
+	)
+	machinerows.Next()
+	if err = machinerows.Scan(&stateName, &countOfIgnoredTransition); err != nil {
+		return nil, fmt.Errorf("error while scanning machines: %w", err)
+	}
+
+	bubblerows, err := m.db.Query(`SELECT name FROM bubbles where machine_id = ?`, id)
+	if err != nil {
+		return nil, err
+	}
+	defer bubblerows.Close()
+	var bubbles []bubblemachine.Bubble
+	for bubblerows.Next() {
+		var b string
+		err = bubblerows.Scan(&b)
+		if err != nil {
+			return nil, fmt.Errorf("error while scanning bubbles: %w", err)
+		}
+		bubbles = append(bubbles, bubblemachine.NewBubble(b))
+	}
+
+	piecesrows, err := m.db.Query(`SELECT value FROM pieces where machine_id = ?;`, id)
+	if err != nil {
+		return nil, err
+	}
+	var pieces []bubblemachine.Piece
+	for piecesrows.Next() {
+		var p int
+		err = piecesrows.Scan(&p)
+		if err != nil {
+			return nil, fmt.Errorf("error while scanning pieces: %w", err)
+		}
+		pieces = append(pieces, bubblemachine.NewPiece(p))
+	}
+
+	var machine bubblemachine.Machine
+	bubblemachine.NewMachineSetterForDb(&machine).
+		SetBubbles(bubbles).
+		SetPieces(pieces).
+		SetCount(countOfIgnoredTransition).
+		SetStateByName(bubblemachine.StateName(stateName))
+
+	return &machine, nil
 }
 
 // Save implements bubblemachine.MachineRepository.
@@ -128,7 +180,7 @@ func (mr MachineRepository) Save(ctx context.Context, m *bubblemachine.Machine) 
 			return err
 		}
 		break
-	case 2:
+	default:
 		tx.Rollback()
 		return errors.New("multiple machines with same id exists")
 	}
@@ -154,8 +206,8 @@ func (mr MachineRepository) savePieces(ctx context.Context, tx *sql.Tx, m *bubbl
 	if err != nil {
 		return err
 	}
-	for _, b := range m.GetBubbles() {
-		_, err = tx.ExecContext(ctx, "INSERT INTO pieces (value, machine_id) VALUES (?, ?)", b.String(), m.GetId())
+	for _, p := range m.GetPieces() {
+		_, err = tx.ExecContext(ctx, "INSERT INTO pieces (value, machine_id) VALUES (?, ?)", p.Value(), m.GetId())
 		if err != nil {
 			return err
 		}
