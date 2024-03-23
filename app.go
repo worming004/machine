@@ -3,13 +3,18 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/worming004/machine/bubblemachine"
 	"github.com/worming004/machine/sqliterepository"
 )
 
 func main() {
-	// saveScenario()
+	shouldClean := os.Getenv("CLEAN_DB")
+	if shouldClean == "true" || shouldClean == "1" {
+		os.Remove("./test.db")
+	}
+	saveScenario()
 	getScenario()
 }
 
