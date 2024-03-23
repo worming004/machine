@@ -10,17 +10,9 @@ import (
 
 func main() {
 	machine := bubblemachine.InitMachine(bubblemachine.WithBubbles(defaultBubbles()))
-	repo, err := sqliterepository.NewMachineRepository(sqliterepository.NewRepositoryRequest{DataSourceName: "test.db", Init: true})
-	if err != nil {
-		panic(err)
-	}
-	defer repo.Close()
-	err = repo.Save(context.Background(), machine)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	machine.Turn()
+	machine.PutMoney(4)
+	createRepoAndSave(machine)
 	log.Print("Machine saved successfully with Id ", machine.GetId())
 
 }
@@ -33,4 +25,17 @@ func defaultBubbles() []bubblemachine.Bubble {
 		bubble[i] = b
 	}
 	return bubble
+}
+
+func createRepoAndSave(machine *bubblemachine.Machine) {
+	repo, err := sqliterepository.NewMachineRepository(sqliterepository.NewRepositoryRequest{DataSourceName: "test.db", Init: true})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer repo.Close()
+	err = repo.Save(context.Background(), machine)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
